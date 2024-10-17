@@ -7,6 +7,10 @@ public class MyFrame extends JFrame {
 		// Sets the frame's title
 		this.setTitle("Super Ultimate Tic-Tac-Toe");
 
+		// Changes the application's icon
+		ImageIcon image = new ImageIcon("23926137_l.jpg");
+		this.setIconImage(image.getImage());
+
 		// Closes the application
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -17,14 +21,17 @@ public class MyFrame extends JFrame {
 		this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 
 		// Set the background color
-		this.getContentPane().setBackground(new Color(157, 220, 242));
+		this.getContentPane().setBackground(new Color(30, 100, 100));
 
 		// Set a layout manager that centers the panel
 		this.setLayout(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
 
 		// Create the main panel to hold the 3x3 groups
-		JPanel mainPanel = new JPanel(new GridLayout(3, 3, 0, 0)); // 3x3 layout with gaps
+		JPanel mainPanel = new JPanel(new GridLayout(3, 3, 10, 10)); // 3x3 layout with gaps
+		int mainPanelSize = Math.min(screenSize.width, screenSize.height) / 4 * 3; // 3/4 the screen size
+		mainPanel.setPreferredSize(new Dimension(mainPanelSize,mainPanelSize));
+		mainPanel.setBorder(BorderFactory.createLineBorder(Color.WHITE, 10)); // Optional: border for each group
 
 		// Create 9 panels for each 3x3 grid
 		for (int i = 0; i < 9; i++) {
