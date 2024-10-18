@@ -36,52 +36,71 @@ public class MyFrame extends JFrame {
 		mainPanel.setPreferredSize(new Dimension(mainPanelSize,mainPanelSize));
 		mainPanel.setBorder(BorderFactory.createLineBorder(Color.WHITE, 10)); // Optional: border for each group
 
+		JButton[][][] buttonGrid = new JButton[9][3][3];
+		int[][][] gridArray = new int[9][3][3];
+
 		// Create 9 panels for each 3x3 grid
-		for (int i = 0; i < 9; i++) {
+		for (int box = 0; box < 9; box++) {
 			JPanel groupPanel = new JPanel(new GridLayout(3, 3)); // 3x3 grid for buttons
 			groupPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK)); // Optional: border for each group
 
-			// Add 9 buttons to the group panel
-			for (int j = 0; j < 9; j++) {
-				JButton button = new JButton(); // Empty button
-				button.setBackground(Color.LIGHT_GRAY); // Set background color
-				button.setFocusPainted(false); // Optional: removes the button border on focus
-				
-				// Adds action to the button press
-			    button.addActionListener(e -> {
-			    	
-			    	turn();
-			    	
-			        // Loads image
-			    	ImageIcon originalCross = new ImageIcon("cross.png");
-			    	ImageIcon originalCircle = new ImageIcon("circle.png");
-			        
-			        // Scales the image to the button's size
-			        Image scaledCross = originalCross.getImage().getScaledInstance(button.getWidth(), button.getHeight(), Image.SCALE_SMOOTH);
-			        ImageIcon scaledCrossIcon = new ImageIcon(scaledCross);
-			        
-			        Image scaledCircle = originalCircle.getImage().getScaledInstance(button.getWidth(), button.getHeight(), Image.SCALE_SMOOTH);
-			        ImageIcon scaledCircleIcon = new ImageIcon(scaledCircle);
-			        
-			        // Sets the button icon when pressed
-			        if (crossTurn) {
-				        button.setIcon(scaledCrossIcon);
-				        button.setDisabledIcon(scaledCrossIcon);
-			        } else {
-				        button.setIcon(scaledCircleIcon);
-				        button.setDisabledIcon(scaledCircleIcon);
-			        }
-			        
-			        // Disables the button
-			        button.setEnabled(false);
-			        
-			    });
-				
-				groupPanel.add(button); // Add the button to the group panel
-			}
+			for (int row = 0; row < 3; row++) {
+				for (int col = 0; col < 3; col++) {
+					// Create a new button
+					JButton button = new JButton("" + (row * 3 + col + 1));
 
-			// Add the group panel to the main panel
-			mainPanel.add(groupPanel);
+					// Add button to the 2D array
+					buttonGrid[box][row][col] = button;
+
+					// Set color
+					button.setBackground(Color.LIGHT_GRAY); // Set background color
+					button.setFocusPainted(false); // Optional: removes the button border on focus
+
+					// Adds action to the button press
+					int finalBox = box;
+					int finalRow = row;
+					int finalCol = col;
+					button.addActionListener(e -> {
+
+						turn();
+
+						// Loads image
+						ImageIcon originalCross = new ImageIcon("cross.png");
+						ImageIcon originalCircle = new ImageIcon("circle.png");
+
+						// Scales the image to the button's size
+						Image scaledCross = originalCross.getImage().getScaledInstance(button.getWidth(), button.getHeight(), Image.SCALE_SMOOTH);
+						ImageIcon scaledCrossIcon = new ImageIcon(scaledCross);
+
+						Image scaledCircle = originalCircle.getImage().getScaledInstance(button.getWidth(), button.getHeight(), Image.SCALE_SMOOTH);
+						ImageIcon scaledCircleIcon = new ImageIcon(scaledCircle);
+
+						// Sets the button icon when pressed
+						if (crossTurn) {
+							gridArray[finalBox][finalRow][finalCol] = 1;
+							System.out.println(finalBox + " " + finalRow + " " + finalCol + " " + "X");
+
+							button.setIcon(scaledCrossIcon);
+							button.setDisabledIcon(scaledCrossIcon);
+						} else {
+							gridArray[finalBox][finalRow][finalCol] = 2;
+							System.out.println(finalBox + " " + finalRow + " " + finalCol + " " + "O");
+
+							button.setIcon(scaledCircleIcon);
+							button.setDisabledIcon(scaledCircleIcon);
+						}
+
+						// Disables the button
+						button.setEnabled(false);
+
+					});
+
+					groupPanel.add(button); // Add the button to the group panel
+				}
+
+				// Add the group panel to the main panel
+				mainPanel.add(groupPanel);
+			}
 		}
 
 		// Center the main panel using GridBagLayout
@@ -99,16 +118,14 @@ public class MyFrame extends JFrame {
 	public static void turn() {
 		
 		round++;
-		
+
 		if (round%2==0) {
 			crossTurn = true;
 		} else {
 			crossTurn = false;
 		}
-		
-		
-	}
 
+	}
 
 	// Main method to launch the application
 	public static void main(String[] args) {
