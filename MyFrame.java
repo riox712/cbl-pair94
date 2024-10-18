@@ -3,6 +3,9 @@ import java.awt.*;
 
 public class MyFrame extends JFrame {
 
+	public static boolean crossTurn = false;
+	public static int round = 1;
+	
 	MyFrame() {
 		// Sets the frame's title
 		this.setTitle("Super Ultimate Tic-Tac-Toe");
@@ -43,6 +46,37 @@ public class MyFrame extends JFrame {
 				JButton button = new JButton(); // Empty button
 				button.setBackground(Color.LIGHT_GRAY); // Set background color
 				button.setFocusPainted(false); // Optional: removes the button border on focus
+				
+				// Adds action to the button press
+			    button.addActionListener(e -> {
+			    	
+			    	turn();
+			    	
+			        // Loads image
+			    	ImageIcon originalCross = new ImageIcon("cross.png");
+			    	ImageIcon originalCircle = new ImageIcon("circle.png");
+			        
+			        // Scales the image to the button's size
+			        Image scaledCross = originalCross.getImage().getScaledInstance(button.getWidth(), button.getHeight(), Image.SCALE_SMOOTH);
+			        ImageIcon scaledCrossIcon = new ImageIcon(scaledCross);
+			        
+			        Image scaledCircle = originalCircle.getImage().getScaledInstance(button.getWidth(), button.getHeight(), Image.SCALE_SMOOTH);
+			        ImageIcon scaledCircleIcon = new ImageIcon(scaledCircle);
+			        
+			        // Sets the button icon when pressed
+			        if (crossTurn) {
+				        button.setIcon(scaledCrossIcon);
+				        button.setDisabledIcon(scaledCrossIcon);
+			        } else {
+				        button.setIcon(scaledCircleIcon);
+				        button.setDisabledIcon(scaledCircleIcon);
+			        }
+			        
+			        // Disables the button
+			        button.setEnabled(false);
+			        
+			    });
+				
 				groupPanel.add(button); // Add the button to the group panel
 			}
 
@@ -61,6 +95,20 @@ public class MyFrame extends JFrame {
 		// Make the frame visible
 		this.setVisible(true);
 	}
+	
+	public static void turn() {
+		
+		round++;
+		
+		if (round%2==0) {
+			crossTurn = true;
+		} else {
+			crossTurn = false;
+		}
+		
+		
+	}
+
 
 	// Main method to launch the application
 	public static void main(String[] args) {
