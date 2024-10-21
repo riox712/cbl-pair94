@@ -50,7 +50,7 @@ public class MyFrame extends JFrame {
 			for (int row = 0; row < 3; row++) {
 				for (int col = 0; col < 3; col++) {
 					// Create a new button
-					JButton button = new JButton("" + (row * 3 + col + 1));
+					JButton button = new JButton();
 
 					// Add button to the 2D array
 					buttonGrid[box][row][col] = button;
