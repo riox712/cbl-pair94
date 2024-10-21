@@ -31,21 +31,66 @@ public class MyFrame extends JFrame {
 		GridBagConstraints gbc = new GridBagConstraints();
 
 		// Create the main panel to hold the 3x3 groups
-		JPanel mainPanel = new JPanel(new GridLayout(3, 3, 10, 10)); // 3x3 layout with gaps
+		JPanel mainPanel = new JPanel(new GridLayout(3, 3, 50, 50)); // 3x3 layout with gaps
 		int mainPanelSize = Math.min(screenSize.width, screenSize.height) / 4 * 3; // 3/4 the screen size
 		mainPanel.setPreferredSize(new Dimension(mainPanelSize,mainPanelSize));
 		mainPanel.setBorder(BorderFactory.createLineBorder(Color.WHITE, 10)); // Optional: border for each group
 
 		JButton[][][] buttonGrid = new JButton[9][3][3];
+
+		// Creates array to store the values of each grid
 		int[][][] gridArray = new int[9][3][3];
-		
+		/*
+		  List of values:
+		  0: Empty
+		  1: Cross
+		  2: Nought
+		  3:
+		  4:
+		  5:
+		  6:
+		  7:
+		 */
+		gridArray[8][1][1] = 3;
+
 		// Creates an array to mark if there has been a winner in one of the grids
 		boolean[] gridCompleted = new boolean[9];
+
+		// Initialize button dimensions
+		int buttonWidth = 0;
+		int buttonHeight = 0;
 
 		// Creates 9 panels for each 3x3 grid
 		for (int box = 0; box < 9; box++) {
 			JPanel groupPanel = new JPanel(new GridLayout(3, 3)); // 3x3 grid for buttons
 			groupPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK)); // Optional: border for each group
+
+			// TEST BUTTON FOR WIDTH AND HEIGHT
+			if (box == 0) {
+				JButton testButton = new JButton();
+				testButton.setPreferredSize(new Dimension(100, 100)); // Set a preferred size
+
+				// Add the button to a temporary panel to ensure layout
+				JPanel tempPanel = new JPanel();
+				tempPanel.add(testButton);
+				tempPanel.doLayout(); // Force layout
+
+				// Add the temporary panel to a JFrame to get sizes
+				JFrame tempFrame = new JFrame();
+				tempFrame.add(tempPanel);
+				tempFrame.pack(); // Calculate the preferred size
+				tempFrame.setVisible(true); // Make the frame visible
+
+				// Get the size of the button after layout
+				buttonWidth = testButton.getWidth(); // Width
+				buttonHeight = testButton.getHeight(); // Height
+
+				// Print the button size for confirmation
+				System.out.println("Button width: " + buttonWidth + ", Button height: " + buttonHeight);
+
+				// Remove the temporary frame from the screen
+				tempFrame.dispose(); // Clean up the temporary frame
+			}
 
 			for (int row = 0; row < 3; row++) {
 				for (int col = 0; col < 3; col++) {
@@ -59,47 +104,35 @@ public class MyFrame extends JFrame {
 					button.setBackground(Color.LIGHT_GRAY); // Set background color
 					button.setFocusPainted(false); // Optional: removes the button border on focus
 
-					// Adds action to the button press
 					int finalBox = box;
 					int finalRow = row;
 					int finalCol = col;
-					
+
+					// Adds action to the button press
+					int finalButtonWidth = buttonWidth;
+					int finalButtonHeight = buttonHeight;
+
 					button.addActionListener(e -> {
 
 						turn();
-
-						// Loads image
-						ImageIcon originalCross = new ImageIcon("cross.png");
-						ImageIcon originalCircle = new ImageIcon("circle.png");
-
-						// Scales the image to the button's size
-						Image scaledCross = originalCross.getImage().getScaledInstance(button.getWidth(), button.getHeight(), Image.SCALE_SMOOTH);
-						ImageIcon scaledCrossIcon = new ImageIcon(scaledCross);
-
-						Image scaledCircle = originalCircle.getImage().getScaledInstance(button.getWidth(), button.getHeight(), Image.SCALE_SMOOTH);
-						ImageIcon scaledCircleIcon = new ImageIcon(scaledCircle);
 
 						// Sets the button icon when pressed
 						if (crossTurn) {
 							gridArray[finalBox][finalRow][finalCol] = 1;
 							System.out.println(finalBox + " " + finalRow + " " + finalCol + " " + "X");
-
-							button.setIcon(scaledCrossIcon);
-							button.setDisabledIcon(scaledCrossIcon);
 						} else {
 							gridArray[finalBox][finalRow][finalCol] = 2;
 							System.out.println(finalBox + " " + finalRow + " " + finalCol + " " + "O");
-
-							button.setIcon(scaledCircleIcon);
-							button.setDisabledIcon(scaledCircleIcon);
 						}
+
+						// Draw the grid (re-scale icons when button size is known)
+						drawGrid(gridArray, buttonGrid, finalButtonWidth, finalButtonHeight);
 
 						// Disables the button
 						button.setEnabled(false);
-						
+
 						// Checks if any of the players won
 						checkWin(gridArray, gridCompleted);
-
 					});
 
 					groupPanel.add(button); // Add the button to the group panel
@@ -121,7 +154,7 @@ public class MyFrame extends JFrame {
 		// Make the frame visible
 		this.setVisible(true);
 	}
-	
+
 	public static void turn() {
 		
 		round++;
@@ -133,8 +166,38 @@ public class MyFrame extends JFrame {
 		}
 
 	}
-	
-	public static void checkWin(int[][][] gridArray, boolean[] gridCompleted) {
+
+	public static void drawGrid(int[][][] gridArray, JButton[][][] buttonGrid, int buttonWidth, int buttonHeight) {
+		// Load images
+		ImageIcon[] icons = loadImages(buttonWidth, buttonHeight);
+
+		for (int box = 0; box < 9; box++) {
+			for (int row = 0; row < 3; row++) {
+				for (int col = 0; col < 3; col++) {
+
+					switch (gridArray[box][row][col]) {
+						case 0:
+							buttonGrid[box][row][col].setIcon(icons[0]);
+							break;
+						case 1:
+							buttonGrid[box][row][col].setIcon(icons[1]); // Cross icon
+							buttonGrid[box][row][col].setDisabledIcon(icons[1]);
+							break;
+						case 2:
+							buttonGrid[box][row][col].setIcon(icons[2]); // Circle icon
+							buttonGrid[box][row][col].setDisabledIcon(icons[2]);
+							break;
+						case 3:
+							buttonGrid[box][row][col].setIcon(icons[3]); // Greg icon
+							buttonGrid[box][row][col].setDisabledIcon(icons[3]);
+							break;
+					}
+				}
+			}
+		}
+	}
+
+    public static void checkWin(int[][][] gridArray, boolean[] gridCompleted) {
 			
 		for (int i = 0; i < 9; i++) {
 			
@@ -184,6 +247,26 @@ public class MyFrame extends JFrame {
 		
 		gridCompleted[i] = true;
 		
+	}
+
+	public static ImageIcon[] loadImages(int buttonWidth, int buttonHeight) {
+		// Load images
+		ImageIcon originalCross = new ImageIcon("cross.png");
+		ImageIcon originalCircle = new ImageIcon("circle.png");
+		ImageIcon originalGreg = new ImageIcon("greggman.png");
+
+		// Scale images
+		Image scaledCross = originalCross.getImage().getScaledInstance(buttonWidth, buttonHeight, Image.SCALE_SMOOTH);
+		ImageIcon scaledCrossIcon = new ImageIcon(scaledCross);
+
+		Image scaledCircle = originalCircle.getImage().getScaledInstance(buttonWidth, buttonHeight, Image.SCALE_SMOOTH);
+		ImageIcon scaledCircleIcon = new ImageIcon(scaledCircle);
+
+		Image scaledGreg = originalGreg.getImage().getScaledInstance(buttonWidth, buttonHeight, Image.SCALE_SMOOTH);
+		ImageIcon scaledGregIcon = new ImageIcon(scaledGreg);
+
+		// Return both icons as an array
+		return new ImageIcon[] {null, scaledCrossIcon, scaledCircleIcon, scaledGregIcon};
 	}
 
 	// Main method to launch the application
