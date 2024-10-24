@@ -41,20 +41,20 @@ public class MyFrame extends JFrame {
 		// Creates array to store the values of each grid
 		int[][][] gridArray = new int[9][3][3];
 		/*
-		  List of values:
-		  0: Empty
-		  1: Cross
-		  2: Nought
-		  3:
-		  4:
-		  5:
-		  6:
-		  7:
+		  ID Index:
+			  0: Empty
+			  1: Cross
+			  2: Circle
+			  3: Greggman
+			  4:
+			  5:
+			  6:
+			  7:
 		 */
 		gridArray[8][1][1] = 3;
 
 		// Creates an array to mark if there has been a winner in one of the grids
-		boolean[] gridCompleted = new boolean[9];
+		boolean[] boxCompleted = new boolean[9];
 
 		// Initialize button dimensions
 		int buttonWidth = 0;
@@ -112,7 +112,7 @@ public class MyFrame extends JFrame {
 					int finalButtonWidth = buttonWidth;
 					int finalButtonHeight = buttonHeight;
 
-					button.addActionListener(e -> {
+					button.addActionListener(_ -> {
 
 						turn();
 
@@ -132,7 +132,13 @@ public class MyFrame extends JFrame {
 						button.setEnabled(false);
 
 						// Checks if any of the players won
-						checkWin(gridArray, gridCompleted);
+						checkWin(gridArray, boxCompleted);
+
+						int currentBox = finalBox;
+						int nextBox = (finalRow * 3) + finalCol;
+
+						lockBoxes(boxCompleted, buttonGrid, gridArray, nextBox, currentBox);
+
 					});
 
 					groupPanel.add(button); // Add the button to the group panel
@@ -197,12 +203,12 @@ public class MyFrame extends JFrame {
 		}
 	}
 
-    public static void checkWin(int[][][] gridArray, boolean[] gridCompleted) {
+    public static void checkWin(int[][][] gridArray, boolean[] boxCompleted) {
 			
 		for (int i = 0; i < 9; i++) {
 			
 			// If there is a winner in this grid, skip it
-			if (gridCompleted[i]) {
+			if (boxCompleted[i]) {
 				continue;
 			}
 			
@@ -210,30 +216,68 @@ public class MyFrame extends JFrame {
 				
 					// Check horizontal
 				if (gridArray[i][j][0] == gridArray[i][j][1] && gridArray[i][j][1] == gridArray[i][j][2] && gridArray[i][j][0] != 0) {
-					announceWinner(gridArray[i][j][0], i, gridCompleted);
+					boxCompleted[i] = true;
+					announceWinner(gridArray[i][j][0], i);
 					return;
 				}
 				
 				 // Check vertical
 	            if (gridArray[i][0][j] == gridArray[i][1][j] && gridArray[i][1][j] == gridArray[i][2][j] && gridArray[i][0][j] != 0) {
-	                announceWinner(gridArray[i][0][j], i, gridCompleted);
+					boxCompleted[i] = true;
+	                announceWinner(gridArray[i][0][j], i);
 	                return;
 	            }
 	            
 	            // Check diagonal
 	            if (gridArray[i][0][0] == gridArray[i][1][1] && gridArray[i][1][1] == gridArray[i][2][2] && gridArray[i][0][0] != 0) {
-	                announceWinner(gridArray[i][0][0], i, gridCompleted);
+					boxCompleted[i] = true;
+	                announceWinner(gridArray[i][0][0], i);
 	                return;
 	            }
 	            if (gridArray[i][0][2] == gridArray[i][1][1] && gridArray[i][1][1] == gridArray[i][2][0] && gridArray[i][0][2] != 0) {
-	                announceWinner(gridArray[i][0][2], i, gridCompleted);
+					boxCompleted[i] = true;
+	                announceWinner(gridArray[i][0][2], i);
 	                return;
 	            }
+
 			}
 		}
 	}
+
+	public static void lockBoxes(boolean[] boxCompleted, JButton[][][] buttonGrid, int[][][] gridArray, int nextBox, int currentBox) {
+		for (int box = 0; box < 9; box++) {
+			for (int row = 0; row < 3; row++) {
+				for (int col = 0; col < 3; col++) {
+					if (!boxCompleted[nextBox]) {
+						if (nextBox != box) {
+							buttonGrid[box][row][col].setEnabled(false);
+						} else {
+							if (gridArray[nextBox][row][col] == 1 || gridArray[nextBox][row][col] == 2) {
+								buttonGrid[nextBox][row][col].setEnabled(false);
+							} else {
+								buttonGrid[nextBox][row][col].setEnabled(true);
+							}
+						}
+					} else {
+						if (currentBox == box) {
+							buttonGrid[box][row][col].setEnabled(false);
+						} else {
+							if (gridArray[box][row][col] == 1 || gridArray[box][row][col] == 2) {
+								buttonGrid[box][row][col].setEnabled(false);
+							} else {
+								buttonGrid[box][row][col].setEnabled(true);
+							}
+						}
+						buttonGrid[nextBox][row][col].setEnabled(false);
+					}
+				}
+			}
+		}
+
+
+	}
 	
-	public static void announceWinner(int player, int i, boolean[] gridCompleted) {
+	public static void announceWinner(int player, int i) {
 		
 		if (player == 1) {
 			
@@ -244,8 +288,6 @@ public class MyFrame extends JFrame {
 	        System.out.println("Circle wins!");
 	        
 	    }
-		
-		gridCompleted[i] = true;
 		
 	}
 
