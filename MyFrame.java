@@ -259,7 +259,7 @@ public class MyFrame extends JFrame {
 							}
 						}
 					} else {
-						if (currentBox == box) {
+						if (currentBox == box || boxCompleted[box]) {
 							buttonGrid[box][row][col].setEnabled(false);
 						} else {
 							if (gridArray[box][row][col] == 1 || gridArray[box][row][col] == 2) {
