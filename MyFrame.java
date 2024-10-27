@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class MyFrame extends JFrame {
 
@@ -51,7 +52,7 @@ public class MyFrame extends JFrame {
 			  6:
 			  7:
 		 */
-		gridArray[8][1][1] = 3;
+		
 
 		// Creates an array to mark if there has been a winner in one of the grids
 		int[] boxCompleted = new int[9];
@@ -138,6 +139,8 @@ public class MyFrame extends JFrame {
 						int nextBox = (finalRow * 3) + finalCol;
 
 						lockBoxes(boxCompleted, buttonGrid, gridArray, nextBox, currentBox);
+						
+						powerupGenerator(boxCompleted, gridArray);
 
 					});
 
@@ -355,6 +358,25 @@ public class MyFrame extends JFrame {
 
 		// Return both icons as an array
 		return new ImageIcon[] {null, scaledCrossIcon, scaledCircleIcon, scaledGregIcon};
+	}
+	
+	
+	public static void powerupGenerator(int[] boxCompleted, int[][][] gridArray) {
+		if (round % 5 == 0) {
+	        while (true) {
+	            // Generate random positions for the power-up within valid ranges
+	            int randomBox = ThreadLocalRandom.current().nextInt(0, 9);
+	            int randomRow = ThreadLocalRandom.current().nextInt(0, 3);
+	            int randomCol = ThreadLocalRandom.current().nextInt(0, 3);
+
+	            // Check if selected box is completed or cell is already occupied
+	            if (boxCompleted[randomBox] == 0 && gridArray[randomBox][randomRow][randomCol] == 0) {
+	                // Place the power-up in an empty cell of an uncompleted box
+	                gridArray[randomBox][randomRow][randomCol] = 3;
+	                break;
+	            }
+	        }
+	    }
 	}
 
 	// Main method to launch the application
