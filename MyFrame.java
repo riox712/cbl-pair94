@@ -9,7 +9,7 @@ public class MyFrame extends JFrame {
 
 	public static boolean crossTurn = false;
 	public static int round = 0;
-	
+
 	MyFrame() {
 		// Sets the frame's title
 		this.setTitle("Super Ultimate Tic-Tac-Toe");
@@ -62,7 +62,6 @@ public class MyFrame extends JFrame {
 			  6:
 			  7:
 		 */
-
 
 		// Creates an array to mark if there has been a winner in one of the grids
 		int[] boxCompleted = new int[9];
@@ -324,9 +323,9 @@ public class MyFrame extends JFrame {
             if (boxCompleted[pattern[0]] == boxCompleted[pattern[1]] &&
                 boxCompleted[pattern[1]] == boxCompleted[pattern[2]] &&
                 boxCompleted[pattern[0]] != 0) {
-                announceWinner(boxCompleted[pattern[0]]);
+				announceWinner(boxCompleted[pattern[0]]);
 				System.out.println("BIG");
-                return;
+				EndScreen endScreen = new EndScreen();
             }
         }
     }
