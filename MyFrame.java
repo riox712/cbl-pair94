@@ -41,10 +41,11 @@ public class MyFrame extends JFrame {
 
 		// Create the main panel to hold the 3x3 boxes
 		JPanel mainPanel = new JPanel(new GridLayout(3, 3, 50, 50)); // 3x3 layout with gaps
-		int mainPanelSize = Math.min(screenSize.width, screenSize.height) * 3/4; // 3/4 the screen size
-		mainPanel.setPreferredSize(new Dimension(mainPanelSize,mainPanelSize));
+		int mainPanelSize = Math.min(screenSize.width, screenSize.height) * 3 / 4; // 3/4 the screen size
+		mainPanel.setPreferredSize(new Dimension(mainPanelSize, mainPanelSize));
 		mainPanel.setBackground(new Color(57, 155, 200));
-		mainPanel.setBorder(BorderFactory.createLineBorder(new Color(57, 155, 200), 10)); // Border for each group
+		mainPanel.setBorder(BorderFactory.createLineBorder(new Color(57, 155, 200), 10));
+		//mainPanel.setBorder(BorderFactory.createLineBorder(new Color(11, 26, 59), 2));
 
 		JButton[][][] buttonGrid = new JButton[9][3][3];
 
@@ -61,27 +62,27 @@ public class MyFrame extends JFrame {
 			  6:
 			  7:
 		 */
-		
+
 
 		// Creates an array to mark if there has been a winner in one of the grids
 		int[] boxCompleted = new int[9];
 
-		int buttonWidth = screenSize.width / 22 - 10;
-		int buttonHeight = screenSize.height * 8/99 - 10;
+		//int buttonWidth = screenSize.width / 22 - 10;
+		//int buttonHeight = screenSize.height * 8/99 - 10;
+		int buttonWidth = mainPanelSize / 11;
+		int buttonHeight = mainPanelSize / 11;
 
 		// Load images
 		ImageIcon[] icons = loadImages(buttonWidth, buttonHeight);
-
-		// Layered pane
-		JLayeredPane layeredPane = new JLayeredPane();
-		layeredPane.setBounds(0, 0, screenSize.width, screenSize.height);
-		this.add(layeredPane);
 
 		// Creates 9 panels for each 3x3 grid
 		for (int box = 0; box < 9; box++) {
 			JPanel groupPanel = new JPanel(new GridLayout(3, 3)); // 3x3 grid for buttons
 			groupPanel.setBackground(new Color(193, 209, 244));
 			groupPanel.setBorder(BorderFactory.createLineBorder(new Color(193, 209, 244), 5));
+
+			JPanel[] groupPanelArray = new JPanel[9];
+			groupPanelArray[box] = groupPanel;
 
 			for (int row = 0; row < 3; row++) {
 				for (int col = 0; col < 3; col++) {
@@ -122,7 +123,7 @@ public class MyFrame extends JFrame {
 					});
 
 					// Adds action to the button press
-                    button.addActionListener(e -> {
+					button.addActionListener(e -> {
 
 						turn();
 
@@ -139,13 +140,13 @@ public class MyFrame extends JFrame {
 						button.setEnabled(false);
 
 						// Checks if any of the players won
-						checkWin(gridArray, boxCompleted);
+						checkWin(gridArray, boxCompleted, groupPanelArray);
 
 						int currentBox = finalBox;
 						int nextBox = (finalRow * 3) + finalCol;
 
 						lockBoxes(boxCompleted, buttonGrid, gridArray, nextBox, currentBox);
-						
+
 						powerupGenerator(boxCompleted, gridArray);
 
 						// Draw the grid (re-scale icons when button size is known)
@@ -159,13 +160,20 @@ public class MyFrame extends JFrame {
 				mainPanel.add(groupPanel);
 			}
 		}
+		// load platform
+		//ImageIcon originalPlatform = new ImageIcon("platform.png");
+		//Image scaledPlatform = originalPlatform.getImage().getScaledInstance(screenSize.width, screenSize.height, Image.SCALE_SMOOTH);
+		//ImageIcon scaledPlatformIcon = new ImageIcon(scaledPlatform);
+
+		//JLabel platformLabel = new JLabel(scaledPlatformIcon);
+
+		//this.add(platformLabel);
 
 		// Center the main panel using GridBagLayout
 		this.add(mainPanel, gbc);
 
-		//layeredPane.add(mainPanel, Integer.valueOf(1));
-
-		//this.add(layeredPane);
+		mainPanel.revalidate();
+		mainPanel.repaint();
 
 		// Make the frame visible
 		this.setVisible(true);
@@ -220,7 +228,7 @@ public class MyFrame extends JFrame {
 		}
 	}
 
-    public static void checkWin(int[][][] gridArray, int[] boxCompleted) {
+    public static void checkWin(int[][][] gridArray, int[] boxCompleted, JPanel[] groupPanelArray) {
 			
 		for (int i = 0; i < 9; i++) {
 			
@@ -240,6 +248,7 @@ public class MyFrame extends JFrame {
 					}
 										
 					announceWinner(gridArray[i][j][0]);
+					drawBoxWin(boxCompleted, groupPanelArray, i);
 					checkBigWin(boxCompleted);
 					return;
 				}
@@ -253,6 +262,7 @@ public class MyFrame extends JFrame {
 					}
 						
 	                announceWinner(gridArray[i][0][j]);
+					drawBoxWin(boxCompleted, groupPanelArray, i);
 	                checkBigWin(boxCompleted);
 	                return;
 	            }
@@ -266,6 +276,7 @@ public class MyFrame extends JFrame {
 					}
 						
 	                announceWinner(gridArray[i][0][0]);
+					drawBoxWin(boxCompleted, groupPanelArray, i);
 	                checkBigWin(boxCompleted);
 	                return;
 	            }
@@ -277,12 +288,11 @@ public class MyFrame extends JFrame {
 					}
 						
 	                announceWinner(gridArray[i][0][2]);
+					drawBoxWin(boxCompleted, groupPanelArray, i);
 	                checkBigWin(boxCompleted);
 	                return;
 	            }
-
 			}
-			
 		}
 	}
     
@@ -303,6 +313,16 @@ public class MyFrame extends JFrame {
             }
         }
     }
+
+	public static void drawBoxWin(int[] boxCompleted, JPanel[] groupPanelArray, int box) {
+		if (boxCompleted[box] == 1) {
+			groupPanelArray[box].setBackground(new Color(55, 89, 164));
+			groupPanelArray[box].setBorder(BorderFactory.createLineBorder(new Color(55, 89, 164), 5));
+		} else if (boxCompleted[box] == 2) {
+			groupPanelArray[box].setBackground(new Color(207, 50, 50));
+			groupPanelArray[box].setBorder(BorderFactory.createLineBorder(new Color(207, 50, 50), 5));
+		}
+	}
 
     public static void lockBoxes(int[] boxCompleted, JButton[][][] buttonGrid, int[][][] gridArray, int nextBox, int currentBox) {
         for (int box = 0; box < 9; box++) {
@@ -385,7 +405,7 @@ public class MyFrame extends JFrame {
 		ImageIcon scaledEmptyHoverIcon = new ImageIcon(scaledEmptyHover);
 
 		// Return both icons as an array
-		return new ImageIcon[] {scaledEmptyIcon, scaledCrossIcon, scaledCircleIcon, scaledGregIcon, null, null, null, null , scaledEmptyLockedIcon, scaledEmptyHoverIcon};
+		return new ImageIcon[] {scaledEmptyIcon, scaledCrossIcon, scaledCircleIcon, scaledGregIcon, null, null, null, null, scaledEmptyLockedIcon, scaledEmptyHoverIcon};
 	}
 	
 	
