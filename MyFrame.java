@@ -1,7 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
 import java.util.concurrent.ThreadLocalRandom;
-
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -9,7 +8,8 @@ public class MyFrame extends JFrame {
 
 	public static boolean crossTurn = false;
 	public static int round = 0;
-
+	public static int pup = 0;
+	
 	MyFrame() {
 		// Sets the frame's title
 		this.setTitle("Super Ultimate Tic-Tac-Toe");
@@ -56,18 +56,17 @@ public class MyFrame extends JFrame {
 			  0: Empty
 			  1: Cross
 			  2: Circle
-			  3: Greggman
-			  4: death
-			  5: agni
-			  6:
+			  3: Repeat
+			  4: Alien
+			  5: Glitch
+			  6: Green
 			  7:
 		 */
+
 
 		// Creates an array to mark if there has been a winner in one of the grids
 		int[] boxCompleted = new int[9];
 
-		//int buttonWidth = screenSize.width / 22 - 10;
-		//int buttonHeight = screenSize.height * 8/99 - 10;
 		int buttonWidth = mainPanelSize / 11;
 		int buttonHeight = mainPanelSize / 11;
 
@@ -123,13 +122,27 @@ public class MyFrame extends JFrame {
 
 					// Adds action to the button press
 					button.addActionListener(e -> {
-
+						
+						int currentBox = finalBox;
+						int nextBox = (finalRow * 3) + finalCol;
+						
 						turn();
+						
+					    if (gridArray[finalBox][finalRow][finalCol] == 6) {
+					        System.out.println("Cannot play over a power-up.");
+					        return; // Exit if trying to play over a power-up
+					    }
+						
+						
 						
 						// Get current value before marking
 						int powerup = gridArray[finalBox][finalRow][finalCol];
 						// Check if it was a power-up
 						checkPowerupCollected(powerup);
+						
+						remover(boxCompleted, gridArray);
+						
+						replace(boxCompleted, gridArray);
 						
 						// Sets the button icon when pressed
 						if (crossTurn) {
@@ -148,10 +161,11 @@ public class MyFrame extends JFrame {
 						// Checks if any of the players won
 						checkWin(gridArray, boxCompleted, groupPanelArray);
 
-						int currentBox = finalBox;
-						int nextBox = (finalRow * 3) + finalCol;
-
+						
+						
 						lockBoxes(boxCompleted, buttonGrid, gridArray, nextBox, currentBox);
+						
+						
 
 						powerupGenerator(boxCompleted, gridArray);
 
@@ -231,13 +245,16 @@ public class MyFrame extends JFrame {
 							buttonGrid[box][row][col].setDisabledIcon(icons[3]);
 							break;
 						case 4:
-							buttonGrid[box][row][col].setIcon(icons[4]); // Death icon
+							buttonGrid[box][row][col].setIcon(icons[4]); // Alien icon
 							buttonGrid[box][row][col].setDisabledIcon(icons[4]);
 							break;
 						case 5:
-							buttonGrid[box][row][col].setIcon(icons[5]); // Agni icon
+							buttonGrid[box][row][col].setIcon(icons[5]); // Glitch icon
 							buttonGrid[box][row][col].setDisabledIcon(icons[5]);
 							break;
+						case 6:
+							buttonGrid[box][row][col].setIcon(icons[6]); // Green icon
+							buttonGrid[box][row][col].setDisabledIcon(icons[6]);
 					}
 				}
 			}
@@ -397,9 +414,10 @@ public class MyFrame extends JFrame {
 		ImageIcon originalEmptyHover = new ImageIcon("emptyHover.png");
 		ImageIcon originalCross = new ImageIcon("cross.png");
 		ImageIcon originalCircle = new ImageIcon("circle.png");
-		ImageIcon originalGreg = new ImageIcon("greggman.png");
-		ImageIcon originalDeath = new ImageIcon("death.png");
-		ImageIcon originalAgni = new ImageIcon("agni.png");
+		ImageIcon originalGreg = new ImageIcon("repeat.png");
+		ImageIcon originalAlien = new ImageIcon("alien.png");
+		ImageIcon originalGlitch = new ImageIcon("glitch.png");
+		ImageIcon originalGreen = new ImageIcon("green.png");
 
 		// Scale images
 		Image scaledCross = originalCross.getImage().getScaledInstance(buttonWidth, buttonHeight, Image.SCALE_SMOOTH);
@@ -411,11 +429,14 @@ public class MyFrame extends JFrame {
 		Image scaledGreg = originalGreg.getImage().getScaledInstance(buttonWidth, buttonHeight, Image.SCALE_SMOOTH);
 		ImageIcon scaledGregIcon = new ImageIcon(scaledGreg);
 		
-		Image scaledDeath = originalDeath.getImage().getScaledInstance(buttonWidth, buttonHeight, Image.SCALE_SMOOTH);
-		ImageIcon scaledDeathIcon = new ImageIcon(scaledDeath);
+		Image scaledAlien = originalAlien.getImage().getScaledInstance(buttonWidth, buttonHeight, Image.SCALE_SMOOTH);
+		ImageIcon scaledAlienIcon = new ImageIcon(scaledAlien);
 		
-		Image scaledAgni = originalAgni.getImage().getScaledInstance(buttonWidth, buttonHeight, Image.SCALE_SMOOTH);
-		ImageIcon scaledAgniIcon = new ImageIcon(scaledAgni);
+		Image scaledGlitch = originalGlitch.getImage().getScaledInstance(buttonWidth, buttonHeight, Image.SCALE_SMOOTH);
+		ImageIcon scaledGlitchIcon = new ImageIcon(scaledGlitch);
+		
+		Image scaledGreen = originalGreen.getImage().getScaledInstance(buttonWidth, buttonHeight, Image.SCALE_SMOOTH);
+		ImageIcon scaledGreenIcon = new ImageIcon(scaledGreen);
 
 		Image scaledEmpty = originalEmpty.getImage().getScaledInstance(buttonWidth, buttonHeight, Image.SCALE_SMOOTH);
 		ImageIcon scaledEmptyIcon = new ImageIcon(scaledEmpty);
@@ -427,9 +448,8 @@ public class MyFrame extends JFrame {
 		ImageIcon scaledEmptyHoverIcon = new ImageIcon(scaledEmptyHover);
 
 		// Return both icons as an array
-		return new ImageIcon[] {scaledEmptyIcon, scaledCrossIcon, scaledCircleIcon, scaledGregIcon, scaledDeathIcon, scaledAgniIcon, null, null , scaledEmptyLockedIcon, scaledEmptyHoverIcon};
+		return new ImageIcon[] {scaledEmptyIcon, scaledCrossIcon, scaledCircleIcon, scaledGregIcon, scaledAlienIcon, scaledGlitchIcon, scaledGreenIcon, null , scaledEmptyLockedIcon, scaledEmptyHoverIcon};
 	}
-	
 	
 	public static void powerupGenerator(int[] boxCompleted, int[][][] gridArray) {
 		if (round % 5 == 0) {
@@ -453,35 +473,90 @@ public class MyFrame extends JFrame {
 	}
 	
 	public static void checkPowerupCollected(int powerup) {
-	    
+	    	
 	    if (powerup == 3 || powerup == 4 || powerup == 5) {
 	        
 	        // Trigger effect based on power-up type
-	        powerupPicker(powerup);
+	    	powerupPicker(powerup);
 	        
 	    }
+	    
 	}
 
 	public static void powerupPicker(int powerupType) {
+		
 	    switch (powerupType) {
 	        case 3:
 	            System.out.println("Power-up Type 3 collected!");
-	            // Adds an additional turn for the player
-	            round++;
+	            // Player gets an extra turn
+	            round--;
 	            break;
 	        case 4:
 	            System.out.println("Power-up Type 4 collected!");
-	            
+	            // Places a box that cannot be replaced
+	            pup = 1;
 	            break;
 	        case 5:
 	            System.out.println("Power-up Type 5 collected!");
-	            
+	            // Randomly clears an uncompleted box
+	            pup = 2;
 	            break;
 	        default:
 	            break;
 	    }
 	}
 
+	public static void replace(int[] boxCompleted, int[][][] gridArray) {
+	    if (pup == 1) {
+	        System.out.println("Placing a green square randomly.");
+	        
+	        while (true) {
+	            // Generate random positions for the green square within valid ranges
+	            int randomBox = ThreadLocalRandom.current().nextInt(0, 9);
+	            int randomRow = ThreadLocalRandom.current().nextInt(0, 3);
+	            int randomCol = ThreadLocalRandom.current().nextInt(0, 3);
+	            
+	            // Check if selected box is completed or cell is already occupied
+	            if (boxCompleted[randomBox] == 0 && gridArray[randomBox][randomRow][randomCol] == 0) {
+	                // Place the green square in an empty cell of an uncompleted box
+	                gridArray[randomBox][randomRow][randomCol] = 6;
+	                pup = 0;
+	                break;
+	            }
+	        }
+	    }
+	}
+
+
+	
+	public static void remover(int[] boxCompleted, int[][][] gridArray) {
+	  
+	    if (pup != 2) return;
+	    
+	    System.out.println("Removing nine spaces");
+
+	    int spacesToRemove = 9; // Total spaces to remove
+	    int removedCount = 0;   // Counter for removed spaces
+
+	    
+	    pup = 0;
+
+	    while (removedCount < spacesToRemove) {
+	        // Generate a random box
+	        int randomBox = ThreadLocalRandom.current().nextInt(0, 9);
+
+	        // Ensure the selected box is not completed
+	        if (boxCompleted[randomBox] == 0) {
+	            // Try to remove a random space within this box
+	            int randomRow = ThreadLocalRandom.current().nextInt(0, 3);
+	            int randomCol = ThreadLocalRandom.current().nextInt(0, 3);
+	            gridArray[randomBox][randomRow][randomCol] = 0;
+	            removedCount++;
+	        }
+	    }
+	}
+	
+	
 	// Main method to launch the application
 	public static void main(String[] args) {
 		new MyFrame();
