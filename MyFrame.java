@@ -8,7 +8,7 @@ import java.awt.event.MouseEvent;
 public class MyFrame extends JFrame {
 
 	public static boolean crossTurn = false;
-	public static int round = 1;
+	public static int round = 0;
 	
 	MyFrame() {
 		// Sets the frame's title
@@ -57,8 +57,8 @@ public class MyFrame extends JFrame {
 			  1: Cross
 			  2: Circle
 			  3: Greggman
-			  4:
-			  5:
+			  4: death
+			  5: agni
 			  6:
 			  7:
 		 */
@@ -126,7 +126,12 @@ public class MyFrame extends JFrame {
 					button.addActionListener(e -> {
 
 						turn();
-
+						
+						// Get current value before marking
+						int powerup = gridArray[finalBox][finalRow][finalCol];
+						// Check if it was a power-up
+						checkPowerupCollected(powerup);
+						
 						// Sets the button icon when pressed
 						if (crossTurn) {
 							gridArray[finalBox][finalRow][finalCol] = 1;
@@ -136,6 +141,8 @@ public class MyFrame extends JFrame {
 							System.out.println(finalBox + " " + finalRow + " " + finalCol + " " + "O");
 						}
 
+
+						
 						// Disables the button
 						button.setEnabled(false);
 
@@ -152,6 +159,8 @@ public class MyFrame extends JFrame {
 						// Draw the grid (re-scale icons when button size is known)
 						drawGrid(gridArray, buttonGrid, buttonWidth, buttonHeight);
 					});
+					
+					
 
 					groupPanel.add(button); // Add the button to the group panel
 				}
@@ -221,6 +230,14 @@ public class MyFrame extends JFrame {
 						case 3:
 							buttonGrid[box][row][col].setIcon(icons[3]); // Greg icon
 							buttonGrid[box][row][col].setDisabledIcon(icons[3]);
+							break;
+						case 4:
+							buttonGrid[box][row][col].setIcon(icons[4]); // Death icon
+							buttonGrid[box][row][col].setDisabledIcon(icons[4]);
+							break;
+						case 5:
+							buttonGrid[box][row][col].setIcon(icons[5]); // Agni icon
+							buttonGrid[box][row][col].setDisabledIcon(icons[5]);
 							break;
 					}
 				}
@@ -347,7 +364,7 @@ public class MyFrame extends JFrame {
                         if (box == currentBox || boxCompleted[box] != 0) {
                             buttonGrid[box][row][col].setEnabled(false);
                         } else {
-                            // Enable any cells that don�t have crosses, circles, or completed grids (but keep powerups active)
+                            // Enable any cells that don't have crosses, circles, or completed grids (but keep power-ups active)
                             if (gridArray[box][row][col] == 1 || gridArray[box][row][col] == 2) {
                                 buttonGrid[box][row][col].setEnabled(false);
                             } else {
@@ -384,6 +401,8 @@ public class MyFrame extends JFrame {
 		ImageIcon originalCross = new ImageIcon("cross.png");
 		ImageIcon originalCircle = new ImageIcon("circle.png");
 		ImageIcon originalGreg = new ImageIcon("greggman.png");
+		ImageIcon originalDeath = new ImageIcon("death.png");
+		ImageIcon originalAgni = new ImageIcon("agni.png");
 
 		// Scale images
 		Image scaledCross = originalCross.getImage().getScaledInstance(buttonWidth, buttonHeight, Image.SCALE_SMOOTH);
@@ -394,6 +413,12 @@ public class MyFrame extends JFrame {
 
 		Image scaledGreg = originalGreg.getImage().getScaledInstance(buttonWidth, buttonHeight, Image.SCALE_SMOOTH);
 		ImageIcon scaledGregIcon = new ImageIcon(scaledGreg);
+		
+		Image scaledDeath = originalDeath.getImage().getScaledInstance(buttonWidth, buttonHeight, Image.SCALE_SMOOTH);
+		ImageIcon scaledDeathIcon = new ImageIcon(scaledDeath);
+		
+		Image scaledAgni = originalAgni.getImage().getScaledInstance(buttonWidth, buttonHeight, Image.SCALE_SMOOTH);
+		ImageIcon scaledAgniIcon = new ImageIcon(scaledAgni);
 
 		Image scaledEmpty = originalEmpty.getImage().getScaledInstance(buttonWidth, buttonHeight, Image.SCALE_SMOOTH);
 		ImageIcon scaledEmptyIcon = new ImageIcon(scaledEmpty);
@@ -405,7 +430,7 @@ public class MyFrame extends JFrame {
 		ImageIcon scaledEmptyHoverIcon = new ImageIcon(scaledEmptyHover);
 
 		// Return both icons as an array
-		return new ImageIcon[] {scaledEmptyIcon, scaledCrossIcon, scaledCircleIcon, scaledGregIcon, null, null, null, null, scaledEmptyLockedIcon, scaledEmptyHoverIcon};
+		return new ImageIcon[] {scaledEmptyIcon, scaledCrossIcon, scaledCircleIcon, scaledGregIcon, scaledDeathIcon, scaledAgniIcon, null, null , scaledEmptyLockedIcon, scaledEmptyHoverIcon};
 	}
 	
 	
@@ -417,42 +442,47 @@ public class MyFrame extends JFrame {
 	            int randomRow = ThreadLocalRandom.current().nextInt(0, 3);
 	            int randomCol = ThreadLocalRandom.current().nextInt(0, 3);
 
+	    		// Randomly chooses a power-up within the range
+	    		int randomPup = ThreadLocalRandom.current().nextInt(3, 6);
+	            
 	            // Check if selected box is completed or cell is already occupied
 	            if (boxCompleted[randomBox] == 0 && gridArray[randomBox][randomRow][randomCol] == 0) {
 	                // Place the power-up in an empty cell of an uncompleted box
-	                gridArray[randomBox][randomRow][randomCol] = 3;
+	                gridArray[randomBox][randomRow][randomCol] = randomPup;
 	                break;
 	            }
 	        }
 	    }
 	}
 	
+	public static void checkPowerupCollected(int powerup) {
+	    
+	    if (powerup == 3 || powerup == 4 || powerup == 5) {
+	        
+	        // Trigger effect based on power-up type
+	        powerupPicker(powerup);
+	        
+	    }
+	}
 
-	// ADD A METHOD WHICH CHECKS IF A POWERUP HAS BEEN COLLECTED (gridArrays value changes from 3 to 1 or 2) !!!!!!!
-	// THE METHOD BELOW SHOULD BE CALLED THEN
-	public static void powerupPicker() {
-		
-		// Randomly chooses a power-up within the range
-		int randomPup = ThreadLocalRandom.current().nextInt(0, 3);
-		
-		switch(randomPup) {
-			// Gives a certain player an additional round
-			case 0:
-				round++;
-				System.out.println("POWERUP 1");
-			    break;
-			
-			case 1:
-				System.out.println("POWERUP 2");
-			    break;
-			case 2:
-				System.out.println("POWERUP 3");
-				 break;
-			default:
-			    // code block
-			}
-
-		
+	public static void powerupPicker(int powerupType) {
+	    switch (powerupType) {
+	        case 3:
+	            System.out.println("Power-up Type 3 collected!");
+	            // Adds an additional turn for the player
+	            round++;
+	            break;
+	        case 4:
+	            System.out.println("Power-up Type 4 collected!");
+	            
+	            break;
+	        case 5:
+	            System.out.println("Power-up Type 5 collected!");
+	            
+	            break;
+	        default:
+	            break;
+	    }
 	}
 
 	// Main method to launch the application
