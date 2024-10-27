@@ -3,8 +3,6 @@ import java.awt.*;
 
 public class EndScreen extends JFrame {
 
-    public int winner = 0;
-
     EndScreen(){
         // Sets the frame's title
         this.setTitle("End Screen!");
