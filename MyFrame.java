@@ -2,6 +2,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.concurrent.ThreadLocalRandom;
 
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
 public class MyFrame extends JFrame {
 
 	public static boolean crossTurn = false;
@@ -30,12 +33,18 @@ public class MyFrame extends JFrame {
 		// Set a layout manager that centers the panel
 		this.setLayout(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.weightx = 1.0;
+		gbc.weighty = 1.0;
+		gbc.anchor = GridBagConstraints.CENTER;
 
-		// Create the main panel to hold the 3x3 groups
+		// Create the main panel to hold the 3x3 boxes
 		JPanel mainPanel = new JPanel(new GridLayout(3, 3, 50, 50)); // 3x3 layout with gaps
-		int mainPanelSize = Math.min(screenSize.width, screenSize.height) / 4 * 3; // 3/4 the screen size
+		int mainPanelSize = Math.min(screenSize.width, screenSize.height) * 3/4; // 3/4 the screen size
 		mainPanel.setPreferredSize(new Dimension(mainPanelSize,mainPanelSize));
-		mainPanel.setBorder(BorderFactory.createLineBorder(Color.WHITE, 10)); // Optional: border for each group
+		mainPanel.setBackground(new Color(57, 155, 200));
+		mainPanel.setBorder(BorderFactory.createLineBorder(new Color(57, 155, 200), 10)); // Border for each group
 
 		JButton[][][] buttonGrid = new JButton[9][3][3];
 
@@ -57,41 +66,22 @@ public class MyFrame extends JFrame {
 		// Creates an array to mark if there has been a winner in one of the grids
 		int[] boxCompleted = new int[9];
 
-		// Initialize button dimensions
-		int buttonWidth = 0;
-		int buttonHeight = 0;
+		int buttonWidth = screenSize.width / 22 - 10;
+		int buttonHeight = screenSize.height * 8/99 - 10;
+
+		// Load images
+		ImageIcon[] icons = loadImages(buttonWidth, buttonHeight);
+
+		// Layered pane
+		JLayeredPane layeredPane = new JLayeredPane();
+		layeredPane.setBounds(0, 0, screenSize.width, screenSize.height);
+		this.add(layeredPane);
 
 		// Creates 9 panels for each 3x3 grid
 		for (int box = 0; box < 9; box++) {
 			JPanel groupPanel = new JPanel(new GridLayout(3, 3)); // 3x3 grid for buttons
-			groupPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK)); // Optional: border for each group
-
-			// TEST BUTTON FOR WIDTH AND HEIGHT
-			if (box == 0) {
-				JButton testButton = new JButton();
-				testButton.setPreferredSize(new Dimension(100, 100)); // Set a preferred size
-
-				// Add the button to a temporary panel to ensure layout
-				JPanel tempPanel = new JPanel();
-				tempPanel.add(testButton);
-				tempPanel.doLayout(); // Force layout
-
-				// Add the temporary panel to a JFrame to get sizes
-				JFrame tempFrame = new JFrame();
-				tempFrame.add(tempPanel);
-				tempFrame.pack(); // Calculate the preferred size
-				tempFrame.setVisible(true); // Make the frame visible
-
-				// Get the size of the button after layout
-				buttonWidth = testButton.getWidth(); // Width
-				buttonHeight = testButton.getHeight(); // Height
-
-				// Print the button size for confirmation
-				System.out.println("Button width: " + buttonWidth + ", Button height: " + buttonHeight);
-
-				// Remove the temporary frame from the screen
-				tempFrame.dispose(); // Clean up the temporary frame
-			}
+			groupPanel.setBackground(new Color(193, 209, 244));
+			groupPanel.setBorder(BorderFactory.createLineBorder(new Color(193, 209, 244), 5));
 
 			for (int row = 0; row < 3; row++) {
 				for (int col = 0; col < 3; col++) {
@@ -101,19 +91,38 @@ public class MyFrame extends JFrame {
 					// Add button to the 2D array
 					buttonGrid[box][row][col] = button;
 
-					// Set color
-					button.setBackground(Color.LIGHT_GRAY); // Set background color
-					button.setFocusPainted(false); // Optional: removes the button border on focus
+					button.setPreferredSize(new Dimension(buttonWidth, buttonHeight));
+
+					button.setContentAreaFilled(false);
+					button.setBorderPainted(false);
+
+					button.setIcon(icons[0]);
+					button.setDisabledIcon(icons[8]);
 
 					int finalBox = box;
 					int finalRow = row;
 					int finalCol = col;
 
-					// Adds action to the button press
-					int finalButtonWidth = buttonWidth;
-					int finalButtonHeight = buttonHeight;
 
-					button.addActionListener(e -> {
+					// Add mouse hover effects
+					button.addMouseListener(new MouseAdapter() {
+						@Override
+						public void mouseEntered(MouseEvent e) {
+							if (gridArray[finalBox][finalRow][finalCol] == 0) {  // Only change if empty
+								button.setIcon(icons[9]);
+							}
+						}
+
+						@Override
+						public void mouseExited(MouseEvent e) {
+							if (gridArray[finalBox][finalRow][finalCol] == 0) {  // Only revert if empty
+								button.setIcon(icons[0]);
+							}
+						}
+					});
+
+					// Adds action to the button press
+                    button.addActionListener(e -> {
 
 						turn();
 
@@ -125,11 +134,6 @@ public class MyFrame extends JFrame {
 							gridArray[finalBox][finalRow][finalCol] = 2;
 							System.out.println(finalBox + " " + finalRow + " " + finalCol + " " + "O");
 						}
-						
-						
-
-						// Draw the grid (re-scale icons when button size is known)
-						drawGrid(gridArray, buttonGrid, finalButtonWidth, finalButtonHeight);
 
 						// Disables the button
 						button.setEnabled(false);
@@ -144,6 +148,8 @@ public class MyFrame extends JFrame {
 						
 						powerupGenerator(boxCompleted, gridArray);
 
+						// Draw the grid (re-scale icons when button size is known)
+						drawGrid(gridArray, buttonGrid, buttonWidth, buttonHeight);
 					});
 
 					groupPanel.add(button); // Add the button to the group panel
@@ -155,12 +161,11 @@ public class MyFrame extends JFrame {
 		}
 
 		// Center the main panel using GridBagLayout
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.weightx = 1.0;
-		gbc.weighty = 1.0;
-		gbc.anchor = GridBagConstraints.CENTER;
 		this.add(mainPanel, gbc);
+
+		//layeredPane.add(mainPanel, Integer.valueOf(1));
+
+		//this.add(layeredPane);
 
 		// Make the frame visible
 		this.setVisible(true);
@@ -182,13 +187,20 @@ public class MyFrame extends JFrame {
 		// Load images
 		ImageIcon[] icons = loadImages(buttonWidth, buttonHeight);
 
+
 		for (int box = 0; box < 9; box++) {
 			for (int row = 0; row < 3; row++) {
 				for (int col = 0; col < 3; col++) {
 
 					switch (gridArray[box][row][col]) {
 						case 0:
-							buttonGrid[box][row][col].setIcon(icons[0]);
+							if (buttonGrid[box][row][col].isEnabled()) {
+								// The button is disabled
+								buttonGrid[box][row][col].setIcon(icons[0]);
+							} else {
+								// The button is enabled
+								buttonGrid[box][row][col].setIcon(icons[8]);
+							}
 							break;
 						case 1:
 							buttonGrid[box][row][col].setIcon(icons[1]); // Cross icon
@@ -286,6 +298,7 @@ public class MyFrame extends JFrame {
                 boxCompleted[pattern[1]] == boxCompleted[pattern[2]] &&
                 boxCompleted[pattern[0]] != 0) {
                 announceWinner(boxCompleted[pattern[0]]);
+				System.out.println("BIG");
                 return;
             }
         }
@@ -314,7 +327,7 @@ public class MyFrame extends JFrame {
                         if (box == currentBox || boxCompleted[box] != 0) {
                             buttonGrid[box][row][col].setEnabled(false);
                         } else {
-                            // Enable any cells that don’t have crosses, circles, or completed grids (but keep powerups active)
+                            // Enable any cells that donï¿½t have crosses, circles, or completed grids (but keep powerups active)
                             if (gridArray[box][row][col] == 1 || gridArray[box][row][col] == 2) {
                                 buttonGrid[box][row][col].setEnabled(false);
                             } else {
@@ -345,6 +358,9 @@ public class MyFrame extends JFrame {
 
 	public static ImageIcon[] loadImages(int buttonWidth, int buttonHeight) {
 		// Load images
+		ImageIcon originalEmpty = new ImageIcon("empty.png");
+		ImageIcon originalEmptyLocked = new ImageIcon("emptyLocked.png");
+		ImageIcon originalEmptyHover = new ImageIcon("emptyHover.png");
 		ImageIcon originalCross = new ImageIcon("cross.png");
 		ImageIcon originalCircle = new ImageIcon("circle.png");
 		ImageIcon originalGreg = new ImageIcon("greggman.png");
@@ -359,8 +375,17 @@ public class MyFrame extends JFrame {
 		Image scaledGreg = originalGreg.getImage().getScaledInstance(buttonWidth, buttonHeight, Image.SCALE_SMOOTH);
 		ImageIcon scaledGregIcon = new ImageIcon(scaledGreg);
 
+		Image scaledEmpty = originalEmpty.getImage().getScaledInstance(buttonWidth, buttonHeight, Image.SCALE_SMOOTH);
+		ImageIcon scaledEmptyIcon = new ImageIcon(scaledEmpty);
+
+		Image scaledEmptyLocked = originalEmptyLocked.getImage().getScaledInstance(buttonWidth, buttonHeight, Image.SCALE_SMOOTH);
+		ImageIcon scaledEmptyLockedIcon = new ImageIcon(scaledEmptyLocked);
+
+		Image scaledEmptyHover = originalEmptyHover.getImage().getScaledInstance(buttonWidth, buttonHeight, Image.SCALE_SMOOTH);
+		ImageIcon scaledEmptyHoverIcon = new ImageIcon(scaledEmptyHover);
+
 		// Return both icons as an array
-		return new ImageIcon[] {null, scaledCrossIcon, scaledCircleIcon, scaledGregIcon};
+		return new ImageIcon[] {scaledEmptyIcon, scaledCrossIcon, scaledCircleIcon, scaledGregIcon, null, null, null, null , scaledEmptyLockedIcon, scaledEmptyHoverIcon};
 	}
 	
 	
