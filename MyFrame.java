@@ -323,8 +323,6 @@ public class MyFrame extends JFrame {
             if (boxCompleted[pattern[0]] == boxCompleted[pattern[1]] &&
                 boxCompleted[pattern[1]] == boxCompleted[pattern[2]] &&
                 boxCompleted[pattern[0]] != 0) {
-				announceWinner(boxCompleted[pattern[0]]);
-				System.out.println("BIG");
 				EndScreen endScreen = new EndScreen();
             }
         }

@@ -3,7 +3,7 @@ import java.awt.*;
 
 public class EndScreen extends JFrame {
 
-    public boolean replay = false;
+    public int winner = 0;
 
     EndScreen(){
         // Sets the frame's title
@@ -26,13 +26,9 @@ public class EndScreen extends JFrame {
         this.getContentPane().setBackground(new Color(30, 100, 100));
 
 
-        ImageIcon originalCrossesWon = new ImageIcon("crossesWon.png");
-        Image scaledCrossesWon = originalCrossesWon.getImage().getScaledInstance(screenSize.width / 2, screenSize.height / 6, Image.SCALE_SMOOTH);
-        ImageIcon scaledCrossesWonIcon = new ImageIcon(scaledCrossesWon);
-
-        //ImageIcon originalCrossesWon = new ImageIcon("crossesWon.png");
-        //Image scaledCrossesWon = originalCrossesWon.getImage().getScaledInstance(screenSize.width / 2, screenSize.height / 6, Image.SCALE_SMOOTH);
-        //ImageIcon scaledCrossesWonIcon = new ImageIcon(scaledCrossesWon);
+        ImageIcon originalGG = new ImageIcon("gg.png");
+        Image scaledGG = originalGG.getImage().getScaledInstance(screenSize.width / 2, screenSize.height / 6, Image.SCALE_SMOOTH);
+        ImageIcon scaledGGIcon = new ImageIcon(scaledGG);
 
         int buttonWidth = screenSize.width / 14;
         int buttonHeight = screenSize.height / 2;
@@ -45,13 +41,13 @@ public class EndScreen extends JFrame {
         Image scaledExit = originalExit.getImage().getScaledInstance(buttonWidth, buttonHeight / 4, Image.SCALE_SMOOTH);
         ImageIcon scaledExitIcon = new ImageIcon(scaledExit);
 
-        JLabel crossLabel = new JLabel(scaledCrossesWonIcon);
+        JLabel ggLabel = new JLabel(scaledGGIcon);
 
         JPanel mainPanel = new JPanel(new GridLayout(2, 1));
         mainPanel.setPreferredSize(new Dimension(screenSize.width / 4,screenSize.height / 4 ));
         mainPanel.setBackground(new Color(57, 155, 200));
 
-        mainPanel.add(crossLabel);
+        mainPanel.add(ggLabel);
 
         JPanel buttonPanel = new JPanel(new GridLayout(1, 2));
         buttonPanel.setPreferredSize(new Dimension(screenSize.width / 4,screenSize.height / 8 ));
