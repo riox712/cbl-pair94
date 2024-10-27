@@ -125,6 +125,8 @@ public class MyFrame extends JFrame {
 							gridArray[finalBox][finalRow][finalCol] = 2;
 							System.out.println(finalBox + " " + finalRow + " " + finalCol + " " + "O");
 						}
+						
+						
 
 						// Draw the grid (re-scale icons when button size is known)
 						drawGrid(gridArray, buttonGrid, finalButtonWidth, finalButtonHeight);
@@ -290,36 +292,37 @@ public class MyFrame extends JFrame {
     }
 
     public static void lockBoxes(int[] boxCompleted, JButton[][][] buttonGrid, int[][][] gridArray, int nextBox, int currentBox) {
-        // Loop through all 9 boxes
         for (int box = 0; box < 9; box++) {
             for (int row = 0; row < 3; row++) {
                 for (int col = 0; col < 3; col++) {
                     
-                    // Always enable power-up cells (gridArray[box][row][col] == 3)
-                    if (gridArray[box][row][col] == 3) {
-                        buttonGrid[box][row][col].setEnabled(true);
-                        continue; // Skip to the next cell
-                    }
-
-                    // If the next box to play has been completed, unlock all uncompleted boxes
-                    if (boxCompleted[nextBox] != 0) {
-                        if (boxCompleted[box] == 0) { // Check only uncompleted boxes
-                            // Enable only if the cell is empty
-                            buttonGrid[box][row][col].setEnabled(gridArray[box][row][col] == 0);
-                        } else {
-                            // Otherwise, disable buttons in completed boxes
+                    // If there is no winner in the target box (nextBox)
+                    if (boxCompleted[nextBox] == 0) {
+                        // If we're not in the nextBox, disable all cells
+                        if (box != nextBox) {
                             buttonGrid[box][row][col].setEnabled(false);
-                        }
-                    } 
-                    // If the next box is not completed, lock all other boxes except the nextBox
-                    else {
-                        if (box == nextBox) {
-                            // Enable only if the cell in the next box is empty
-                            buttonGrid[box][row][col].setEnabled(gridArray[box][row][col] == 0);
                         } else {
-                            // Disable all cells in other boxes
-                            buttonGrid[box][row][col].setEnabled(false);
+                            // Enable cells in the nextBox unless they already contain a cross (1) or circle (2)
+                            if (gridArray[nextBox][row][col] == 1 || gridArray[nextBox][row][col] == 2) {
+                                buttonGrid[nextBox][row][col].setEnabled(false);
+                            } else {
+                                buttonGrid[nextBox][row][col].setEnabled(true);
+                            }
                         }
+                    } else {
+                        // When nextBox has a winner or we're in any completed box, enforce locks across the grid
+                        if (box == currentBox || boxCompleted[box] != 0) {
+                            buttonGrid[box][row][col].setEnabled(false);
+                        } else {
+                            // Enable any cells that don’t have crosses, circles, or completed grids (but keep powerups active)
+                            if (gridArray[box][row][col] == 1 || gridArray[box][row][col] == 2) {
+                                buttonGrid[box][row][col].setEnabled(false);
+                            } else {
+                                buttonGrid[box][row][col].setEnabled(true);
+                            }
+                        }
+                        // Ensure all cells in the nextBox are locked after a win there
+                        buttonGrid[nextBox][row][col].setEnabled(false);
                     }
                 }
             }
@@ -377,6 +380,34 @@ public class MyFrame extends JFrame {
 	            }
 	        }
 	    }
+	}
+	
+
+	// ADD A METHOD WHICH CHECKS IF A POWERUP HAS BEEN COLLECTED (gridArrays value changes from 3 to 1 or 2) !!!!!!!
+	// THE METHOD BELOW SHOULD BE CALLED THEN
+	public static void powerupPicker() {
+		
+		// Randomly chooses a power-up within the range
+		int randomPup = ThreadLocalRandom.current().nextInt(0, 3);
+		
+		switch(randomPup) {
+			// Gives a certain player an additional round
+			case 0:
+				round++;
+				System.out.println("POWERUP 1");
+			    break;
+			
+			case 1:
+				System.out.println("POWERUP 2");
+			    break;
+			case 2:
+				System.out.println("POWERUP 3");
+				 break;
+			default:
+			    // code block
+			}
+
+		
 	}
 
 	// Main method to launch the application
