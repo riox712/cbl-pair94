@@ -8,7 +8,7 @@ public class EndScreen extends JFrame {
         this.setTitle("End Screen!");
 
         // Changes the application's icon
-        ImageIcon image = new ImageIcon("23926137_l.jpg");
+        ImageIcon image = new ImageIcon("images/23926137_l.jpg");
         this.setIconImage(image.getImage());
 
         // Closes the application
@@ -24,18 +24,18 @@ public class EndScreen extends JFrame {
         this.getContentPane().setBackground(new Color(30, 100, 100));
 
 
-        ImageIcon originalGG = new ImageIcon("gg.png");
+        ImageIcon originalGG = new ImageIcon("images/gg.png");
         Image scaledGG = originalGG.getImage().getScaledInstance(screenSize.width / 2, screenSize.height / 6, Image.SCALE_SMOOTH);
         ImageIcon scaledGGIcon = new ImageIcon(scaledGG);
 
         int buttonWidth = screenSize.width / 14;
         int buttonHeight = screenSize.height / 2;
 
-        ImageIcon originalPlayAgain = new ImageIcon("circle.png");
+        ImageIcon originalPlayAgain = new ImageIcon("images/circle.png");
         Image scaledPlayAgain = originalPlayAgain.getImage().getScaledInstance(buttonWidth, buttonHeight / 4, Image.SCALE_SMOOTH);
         ImageIcon scaledPlayAgainIcon = new ImageIcon(scaledPlayAgain);
 
-        ImageIcon originalExit = new ImageIcon("cross.png");
+        ImageIcon originalExit = new ImageIcon("images/cross.png");
         Image scaledExit = originalExit.getImage().getScaledInstance(buttonWidth, buttonHeight / 4, Image.SCALE_SMOOTH);
         ImageIcon scaledExitIcon = new ImageIcon(scaledExit);
 

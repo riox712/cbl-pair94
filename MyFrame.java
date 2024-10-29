@@ -15,7 +15,7 @@ public class MyFrame extends JFrame {
 		this.setTitle("Super Ultimate Tic-Tac-Toe");
 
 		// Changes the application's icon
-		ImageIcon image = new ImageIcon("23926137_l.jpg");
+		ImageIcon image = new ImageIcon("images/23926137_l.jpg");
 		this.setIconImage(image.getImage());
 
 		// Closes the application
@@ -60,7 +60,6 @@ public class MyFrame extends JFrame {
 			  4: Alien
 			  5: Glitch
 			  6: Green
-			  7:
 		 */
 
 
@@ -172,8 +171,6 @@ public class MyFrame extends JFrame {
 						// Draw the grid (re-scale icons when button size is known)
 						drawGrid(gridArray, buttonGrid, buttonWidth, buttonHeight);
 					});
-					
-					
 
 					groupPanel.add(button); // Add the button to the group panel
 				}
@@ -182,14 +179,6 @@ public class MyFrame extends JFrame {
 				mainPanel.add(groupPanel);
 			}
 		}
-		// load platform
-		//ImageIcon originalPlatform = new ImageIcon("platform.png");
-		//Image scaledPlatform = originalPlatform.getImage().getScaledInstance(screenSize.width, screenSize.height, Image.SCALE_SMOOTH);
-		//ImageIcon scaledPlatformIcon = new ImageIcon(scaledPlatform);
-
-		//JLabel platformLabel = new JLabel(scaledPlatformIcon);
-
-		//this.add(platformLabel);
 
 		// Center the main panel using GridBagLayout
 		this.add(mainPanel, gbc);
@@ -205,11 +194,7 @@ public class MyFrame extends JFrame {
 		
 		round++;
 
-		if (round%2==0) {
-			crossTurn = true;
-		} else {
-			crossTurn = false;
-		}
+        crossTurn = round % 2 == 0;
 
 	}
 
@@ -241,7 +226,7 @@ public class MyFrame extends JFrame {
 							buttonGrid[box][row][col].setDisabledIcon(icons[2]);
 							break;
 						case 3:
-							buttonGrid[box][row][col].setIcon(icons[3]); // Greg icon
+							buttonGrid[box][row][col].setIcon(icons[3]); // Repeat icon
 							buttonGrid[box][row][col].setDisabledIcon(icons[3]);
 							break;
 						case 4:
@@ -409,15 +394,15 @@ public class MyFrame extends JFrame {
 
 	public static ImageIcon[] loadImages(int buttonWidth, int buttonHeight) {
 		// Load images
-		ImageIcon originalEmpty = new ImageIcon("empty.png");
-		ImageIcon originalEmptyLocked = new ImageIcon("emptyLocked.png");
-		ImageIcon originalEmptyHover = new ImageIcon("emptyHover.png");
-		ImageIcon originalCross = new ImageIcon("cross.png");
-		ImageIcon originalCircle = new ImageIcon("circle.png");
-		ImageIcon originalGreg = new ImageIcon("repeat.png");
-		ImageIcon originalAlien = new ImageIcon("alien.png");
-		ImageIcon originalGlitch = new ImageIcon("glitch.png");
-		ImageIcon originalGreen = new ImageIcon("green.png");
+		ImageIcon originalEmpty = new ImageIcon("images/empty.png");
+		ImageIcon originalEmptyLocked = new ImageIcon("images/emptyLocked.png");
+		ImageIcon originalEmptyHover = new ImageIcon("images/emptyHover.png");
+		ImageIcon originalCross = new ImageIcon("images/cross.png");
+		ImageIcon originalCircle = new ImageIcon("images/circle.png");
+		ImageIcon originalGreg = new ImageIcon("images/repeat.png");
+		ImageIcon originalAlien = new ImageIcon("images/alien.png");
+		ImageIcon originalGlitch = new ImageIcon("images/glitch.png");
+		ImageIcon originalGreen = new ImageIcon("images/green.png");
 
 		// Scale images
 		Image scaledCross = originalCross.getImage().getScaledInstance(buttonWidth, buttonHeight, Image.SCALE_SMOOTH);
